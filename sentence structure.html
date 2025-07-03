@@ -1,0 +1,778 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentence Builder for Beginners</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .draggable {
+            cursor: grab;
+            user-select: none;
+        }
+        
+        .draggable:active {
+            cursor: grabbing;
+        }
+        
+        .drop-zone {
+            min-height: 60px;
+            transition: all 0.3s;
+        }
+        
+        .drop-zone.highlight {
+            background-color: rgba(99, 102, 241, 0.1);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.5);
+        }
+        
+        .sentence-pattern {
+            transition: all 0.3s;
+        }
+        
+        .sentence-pattern:hover {
+            transform: translateY(-2px);
+        }
+        
+        .word-chip {
+            transition: all 0.2s;
+        }
+        
+        .word-chip:hover {
+            transform: scale(1.05);
+        }
+        
+        .feedback-correct {
+            animation: pulse 1.5s;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(52, 211, 153, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+        }
+        
+        .chinese-translation {
+            color: #6366f1;
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        
+        .progress-indicator {
+            transition: all 0.3s ease;
+        }
+        
+        .footer-link {
+            position: relative;
+        }
+        
+        .footer-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: #fff;
+            transition: width 0.3s ease;
+        }
+        
+        .footer-link:hover::after {
+            width: 100%;
+        }
+        
+        .main-content {
+            flex: 1;
+        }
+    </style>
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Z6V4ZXXZXS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Z6V4ZXXZXS');
+</script>
+<body class="p-4 md:p-8 flex flex-col min-h-screen">
+    <div class="main-content flex-grow">
+        <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="bg-indigo-600 text-white p-6">
+                <h1 class="text-2xl md:text-3xl font-bold">Sentence Builder for Beginners</h1>
+                <p class="mt-2 opacity-90">Build your understanding of basic English sentence patterns</p>
+            </div>
+            
+            <div class="p-6">
+                <div class="mb-8">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-3">Select a Sentence Pattern:</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="sentence-pattern bg-indigo-50 p-4 rounded-lg border border-indigo-100 cursor-pointer hover:bg-indigo-100" data-pattern="svo">
+                            <h3 class="font-medium text-indigo-800">Subject + Verb + Object</h3>
+                            <p class="text-sm text-gray-600 mt-1">Basic sentence structure</p>
+                            <p class="text-sm chinese-translation mt-1">主詞 + 動詞 + 受詞（基本句型）</p>
+                            <div class="mt-2 flex">
+                                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-1">S</span>
+                                <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded mr-1">V</span>
+                                <span class="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded">O</span>
+                            </div>
+                        </div>
+                        
+                        <div class="sentence-pattern bg-indigo-50 p-4 rounded-lg border border-indigo-100 cursor-pointer hover:bg-indigo-100" data-pattern="svdo">
+                            <h3 class="font-medium text-indigo-800">Subject + Verb + Indirect Object + Direct Object</h3>
+                            <p class="text-sm text-gray-600 mt-1">Double object pattern</p>
+                            <p class="text-sm chinese-translation mt-1">主詞 + 動詞 + 間接受詞 + 直接受詞（雙受詞句型）</p>
+                            <div class="mt-2 flex flex-wrap">
+                                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-1 mb-1">S</span>
+                                <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded mr-1 mb-1">V</span>
+                                <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded mr-1 mb-1">IO</span>
+                                <span class="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded mb-1">DO</span>
+                            </div>
+                        </div>
+                        
+                        <div class="sentence-pattern bg-indigo-50 p-4 rounded-lg border border-indigo-100 cursor-pointer hover:bg-indigo-100" data-pattern="svc">
+                            <h3 class="font-medium text-indigo-800">Subject + Verb + Complement</h3>
+                            <p class="text-sm text-gray-600 mt-1">Linking verb pattern</p>
+                            <p class="text-sm chinese-translation mt-1">主詞 + 連繫動詞 + 補語（主詞補語句型）</p>
+                            <div class="mt-2 flex">
+                                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-1">S</span>
+                                <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded mr-1">V</span>
+                                <span class="bg-pink-100 text-pink-800 text-xs px-2 py-1 rounded">C</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="practice-area" class="hidden">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">Instructions:</h2>
+                        <p class="text-gray-600">Drag the words below to form a correct sentence using the selected pattern.</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-medium text-gray-700">Current Pattern:</h3>
+                            <div class="text-sm text-gray-600">
+                                Sentence <span id="current-sentence-num">1</span> of <span id="total-sentences">6</span>
+                            </div>
+                        </div>
+                        <div id="pattern-display" class="flex flex-wrap gap-2 mb-2 mt-2"></div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+                            <div id="progress-bar" class="bg-indigo-600 h-2.5 rounded-full progress-indicator" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-8">
+                        <h3 class="font-medium text-gray-700 mb-2">Build Your Sentence:</h3>
+                        
+                        <!-- Current sentence translation hint -->
+                        <div id="current-sentence-hint" class="mb-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                            <p class="text-sm font-medium text-gray-700">Sentence meaning:</p>
+                            <p id="sentence-translation-hint" class="text-sm chinese-translation mt-1"></p>
+                        </div>
+                        
+                        <div id="sentence-builder" class="drop-zone flex flex-wrap gap-2 min-h-[60px] p-4 rounded-lg border-2 border-dashed border-gray-300 mb-4"></div>
+                        
+                        <div class="flex justify-end">
+                            <button id="check-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition">
+                                Check Sentence
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <h3 class="font-medium text-gray-700 mb-2">Available Words:</h3>
+                        <div id="word-bank" class="flex flex-wrap gap-2 p-4 bg-gray-50 rounded-lg border border-gray-200"></div>
+                    </div>
+                    
+                    <div id="feedback" class="hidden p-4 rounded-lg mb-6"></div>
+                    
+                    <div class="flex justify-between">
+                        <button id="back-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition">
+                            Back to Patterns 
+                        </button>
+                        <button id="next-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition hidden">
+                            Next Example 
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="explanation-area" class="mt-8 p-6 bg-blue-50 rounded-lg border border-blue-100 hidden">
+                    <h2 class="text-xl font-semibold text-blue-800 mb-3">Pattern Explanation </h2>
+                    <div id="pattern-explanation" class="text-gray-700"></div>
+                    <div id="pattern-explanation-zh" class="chinese-translation mt-2"></div>
+                    
+                    <div class="mt-4">
+                        <h3 class="font-medium text-blue-800 mb-2">Example Sentences </h3>
+                        <ul id="example-sentences" class="list-disc pl-5 text-gray-700"></ul>
+                    </div>
+                    
+                    <div id="translation-toggle" class="mt-4 flex items-center">
+                        <input type="checkbox" id="show-translations" class="mr-2">
+                        <label for="show-translations" class="text-gray-700">Show Chinese translations 顯示中文翻譯</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="mt-8 bg-indigo-600 text-indigo-100 rounded-lg shadow-lg max-w-4xl mx-auto p-4">
+        <div class="flex flex-col md:flex-row justify-center items-center text-center md:text-left">
+            <p class="mb-2 md:mb-0 md:mr-4">
+                <a href="https://www.aaronshi.cc" target="_blank" rel="noopener noreferrer" class="footer-link flex items-center hover:text-white transition duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
+                    </svg>
+                    Go to AaronShi.cc
+                </a>
+            </p>
+            <span class="hidden md:block mx-4 text-indigo-300">|</span>
+            <a href="https://app.aaronshi.cc" target="_blank" rel="noopener noreferrer" class="footer-link flex items-center hover:text-white transition duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Back to AaronShi.cc App
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sentencePatterns = document.querySelectorAll('.sentence-pattern');
+            const practiceArea = document.getElementById('practice-area');
+            const patternDisplay = document.getElementById('pattern-display');
+            const wordBank = document.getElementById('word-bank');
+            const sentenceBuilder = document.getElementById('sentence-builder');
+            const checkBtn = document.getElementById('check-btn');
+            const backBtn = document.getElementById('back-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const feedback = document.getElementById('feedback');
+            const explanationArea = document.getElementById('explanation-area');
+            const patternExplanation = document.getElementById('pattern-explanation');
+            const patternExplanationZh = document.getElementById('pattern-explanation-zh');
+            const exampleSentences = document.getElementById('example-sentences');
+            const showTranslations = document.getElementById('show-translations');
+            const sentenceTranslationHint = document.getElementById('sentence-translation-hint');
+            const currentSentenceNum = document.getElementById('current-sentence-num');
+            const totalSentences = document.getElementById('total-sentences');
+            const progressBar = document.getElementById('progress-bar');
+            
+            let currentPattern = '';
+            let currentExampleIndex = 0;
+            let draggedElement = null;
+            
+            const patterns = {
+                svo: {
+                    name: 'Subject + Verb + Object',
+                    nameZh: '主詞 + 動詞 + 受詞',
+                    explanation: 'This is the most common sentence structure in English. The subject performs an action (verb) on the object.',
+                    explanationZh: '這是英文中最常見的句型結構。主詞對受詞執行動作（動詞）。',
+                    examples: [
+                        {
+                            words: ['The', 'talented', 'musician', 'composed', 'a', 'beautiful', 'symphony', 'last', 'month', 'in', 'Paris'],
+                            correct: ['The', 'talented', 'musician', 'composed', 'a', 'beautiful', 'symphony'],
+                            parts: ['Subject', 'Subject', 'Subject', 'Verb', 'Object', 'Object', 'Object'],
+                            translation: '這位才華洋溢的音樂家上個月在巴黎創作了一首優美的交響曲。'
+                        },
+                        {
+                            words: ['Many', 'students', 'have', 'completed', 'their', 'challenging', 'assignments', 'before', 'the', 'deadline'],
+                            correct: ['Many', 'students', 'have', 'completed', 'their', 'challenging', 'assignments'],
+                            parts: ['Subject', 'Subject', 'Verb', 'Verb', 'Object', 'Object', 'Object'],
+                            translation: '許多學生在截止日期前完成了他們具有挑戰性的作業。'
+                        },
+                        {
+                            words: ['The', 'curious', 'scientist', 'carefully', 'examined', 'the', 'rare', 'specimen', 'under', 'the', 'microscope'],
+                            correct: ['The', 'curious', 'scientist', 'carefully', 'examined', 'the', 'rare', 'specimen'],
+                            parts: ['Subject', 'Subject', 'Subject', 'Verb', 'Verb', 'Object', 'Object', 'Object'],
+                            translation: '這位好奇的科學家在顯微鏡下仔細檢查了這個稀有標本。'
+                        },
+                        {
+                            words: ['Several', 'experienced', 'engineers', 'quickly', 'solved', 'the', 'complex', 'technical', 'problem', 'during', 'the', 'meeting'],
+                            correct: ['Several', 'experienced', 'engineers', 'quickly', 'solved', 'the', 'complex', 'technical', 'problem'],
+                            parts: ['Subject', 'Subject', 'Subject', 'Verb', 'Verb', 'Object', 'Object', 'Object', 'Object'],
+                            translation: '幾位經驗豐富的工程師在會議期間迅速解決了這個複雜的技術問題。'
+                        },
+                        {
+                            words: ['The', 'enthusiastic', 'crowd', 'loudly', 'cheered', 'their', 'favorite', 'sports', 'team', 'throughout', 'the', 'game'],
+                            correct: ['The', 'enthusiastic', 'crowd', 'loudly', 'cheered', 'their', 'favorite', 'sports', 'team'],
+                            parts: ['Subject', 'Subject', 'Subject', 'Verb', 'Verb', 'Object', 'Object', 'Object', 'Object'],
+                            translation: '熱情的觀眾在整場比賽中大聲為他們最喜愛的運動隊歡呼。'
+                        },
+                        {
+                            words: ['The', 'skilled', 'photographer', 'perfectly', 'captured', 'the', 'breathtaking', 'mountain', 'landscape', 'at', 'sunset'],
+                            correct: ['The', 'skilled', 'photographer', 'perfectly', 'captured', 'the', 'breathtaking', 'mountain', 'landscape'],
+                            parts: ['Subject', 'Subject', 'Subject', 'Verb', 'Verb', 'Object', 'Object', 'Object', 'Object'],
+                            translation: '這位技術嫻熟的攝影師在日落時完美地捕捉到了令人驚嘆的山景。'
+                        }
+                    ],
+                    displayColors: ['bg-blue-100 text-blue-800', 'bg-green-100 text-green-800', 'bg-amber-100 text-amber-800'],
+                    exampleList: [
+                        {
+                            en: "The energetic dog chased the playful squirrel.",
+                            zh: "精力充沛的狗追逐著活潑的松鼠。"
+                        },
+                        {
+                            en: "My sister always reads interesting novels.",
+                            zh: "我姐姐總是閱讀有趣的小說。"
+                        },
+                        {
+                            en: "The experienced chef prepared a delicious meal.",
+                            zh: "經驗豐富的廚師準備了一頓美味的餐點。"
+                        },
+                        {
+                            en: "Our company recently launched an innovative product.",
+                            zh: "我們公司最近推出了一款創新產品。"
+                        },
+                        {
+                            en: "The dedicated teacher inspires her young students.",
+                            zh: "這位敬業的老師激勵著她的年輕學生們。"
+                        }
+                    ]
+                },
+                svdo: {
+                    name: 'Subject + Verb + Indirect Object + Direct Object',
+                    nameZh: '主詞 + 動詞 + 間接受詞 + 直接受詞',
+                    explanation: 'In this pattern, the subject performs an action (verb) that transfers something (direct object) to someone (indirect object).',
+                    explanationZh: '在這個句型中，主詞執行的動作（動詞）將某物（直接受詞）轉移給某人（間接受詞）。',
+                    examples: [
+                        {
+                            words: ['The', 'generous', 'donor', 'gave', 'the', 'local', 'charity', 'a', 'substantial', 'donation', 'last', 'week'],
+                            correct: ['The', 'generous', 'donor', 'gave', 'the', 'local', 'charity', 'a', 'substantial', 'donation'],
+                            parts: ['Subject', 'Subject', 'Subject', 'Verb', 'Indirect Object', 'Indirect Object', 'Indirect Object', 'Direct Object', 'Direct Object', 'Direct Object'],
+                            translation: '這位慷慨的捐贈者上週給當地慈善機構捐了一筆可觀的捐款。'
+                        },
+                        {
+                            words: ['My', 'thoughtful', 'colleague', 'sent', 'all', 'team', 'members', 'an', 'important', 'update', 'about', 'the', 'project'],
+                            correct: ['My', 'thoughtful', 'colleague', 'sent', 'all', 'team', 'members', 'an', 'important', 'update'],
+                            parts: ['Subject', 'Subject', 'Subject', 'Verb', 'Indirect Object', 'Indirect Object', 'Indirect Object', 'Direct Object', 'Direct Object', 'Direct Object'],
+                            translation: '我那位體貼的同事向所有團隊成員發送了關於專案的重要更新。'
+                        },
+                        {
+                            words: ['The', 'experienced', 'professor', 'offered', 'her', 'dedicated', 'students', 'valuable', 'career', 'advice', 'during', 'office', 'hours'],
+                            correct: ['The', 'experienced', 'professor', 'offered', 'her', 'dedicated', 'students', 'valuable', 'career', 'advice'],
+                            parts: ['Subject', 'Subject', 'Subject', 'Verb', 'Indirect Object', 'Indirect Object', 'Indirect Object', 'Direct Object', 'Direct Object', 'Direct Object'],
+                            translation: '這位經驗豐富的教授在辦公時間為她那些專心致志的學生提供了寶貴的職業建議。'
+                        },
+                        {
+                            words: ['The', 'famous', 'author', 'read', 'the', 'excited', 'children', 'a', 'chapter', 'from', 'her', 'new', 'book'],
+                            correct: ['The', 'famous', 'author', 'read', 'the', 'excited', 'children', 'a', 'chapter'],
+                            parts: ['Subject', 'Subject', 'Subject', 'Verb', 'Indirect Object', 'Indirect Object', 'Indirect Object', 'Direct Object', 'Direct Object'],
+                            translation: '這位著名作家為興奮的孩子們朗讀了她新書中的一個章節。'
+                        },
+                        {
+                            words: ['Our', 'helpful', 'neighbor', 'lent', 'my', 'younger', 'brother', 'his', 'professional', 'tools', 'for', 'the', 'weekend'],
+                            correct: ['Our', 'helpful', 'neighbor', 'lent', 'my', 'younger', 'brother', 'his', 'professional', 'tools'],
+                            parts: ['Subject', 'Subject', 'Subject', 'Verb', 'Indirect Object', 'Indirect Object', 'Indirect Object', 'Direct Object', 'Direct Object', 'Direct Object'],
+                            translation: '我們樂於助人的鄰居把他的專業工具借給了我弟弟用於週末。'
+                        },
+                        {
+                            words: ['The', 'creative', 'chef', 'served', 'the', 'impressed', 'guests', 'an', 'innovative', 'dessert', 'after', 'dinner'],
+                            correct: ['The', 'creative', 'chef', 'served', 'the', 'impressed', 'guests', 'an', 'innovative', 'dessert'],
+                            parts: ['Subject', 'Subject', 'Subject', 'Verb', 'Indirect Object', 'Indirect Object', 'Indirect Object', 'Direct Object', 'Direct Object', 'Direct Object'],
+                            translation: '這位有創意的廚師在晚餐後為印象深刻的客人們端上了一道創新的甜點。'
+                        }
+                    ],
+                    displayColors: ['bg-blue-100 text-blue-800', 'bg-green-100 text-green-800', 'bg-purple-100 text-purple-800', 'bg-amber-100 text-amber-800'],
+                    exampleList: [
+                        {
+                            en: "My mother bought her children new winter coats.",
+                            zh: "我媽媽為她的孩子們買了新的冬季外套。"
+                        },
+                        {
+                            en: "The teacher showed the students a fascinating experiment.",
+                            zh: "老師向學生們展示了一個引人入勝的實驗。"
+                        },
+                        {
+                            en: "The company sent all employees a holiday bonus.",
+                            zh: "公司給所有員工發了節日獎金。"
+                        },
+                        {
+                            en: "My uncle brought his nieces beautiful souvenirs.",
+                            zh: "我叔叔給他的侄女們帶來了漂亮的紀念品。"
+                        },
+                        {
+                            en: "The coach taught his team new strategies.",
+                            zh: "教練教給他的團隊新的策略。"
+                        }
+                    ]
+                },
+                svc: {
+                    name: 'Subject + Verb + Complement',
+                    nameZh: '主詞 + 連綴動詞 + 補語',
+                    explanation: 'This pattern uses linking verbs (like "be", "seem", "become") to connect the subject with a complement that describes or identifies the subject.',
+                    explanationZh: '這個句型使用連綴動詞（如"be"、"seem"、"become"）將主詞與描述或識別主詞的補語連接起來。',
+                    examples: [
+                        {
+                            words: ['The', 'innovative', 'solution', 'seems', 'extremely', 'promising', 'for', 'future', 'applications', 'in', 'this', 'field'],
+                            correct: ['The', 'innovative', 'solution', 'seems', 'extremely', 'promising'],
+                            parts: ['Subject', 'Subject', 'Subject', 'Verb', 'Complement', 'Complement'],
+                            translation: '這個創新的解決方案對於該領域的未來應用似乎非常有前途。'
+                        },
+                        {
+                            words: ['Their', 'youngest', 'daughter', 'has', 'become', 'an', 'accomplished', 'pianist', 'after', 'years', 'of', 'practice'],
+                            correct: ['Their', 'youngest', 'daughter', 'has', 'become', 'an', 'accomplished', 'pianist'],
+                            parts: ['Subject', 'Subject', 'Subject', 'Verb', 'Verb', 'Complement', 'Complement', 'Complement'],
+                            translation: '他們最小的女兒經過多年的練習已經成為一位技藝精湛的鋼琴家。'
+                        },
+                        {
+                            words: ['The', 'historic', 'building', 'remains', 'structurally', 'sound', 'despite', 'its', 'age', 'and', 'weathering'],
+                            correct: ['The', 'historic', 'building', 'remains', 'structurally', 'sound'],
+                            parts: ['Subject', 'Subject', 'Subject', 'Verb', 'Complement', 'Complement'],
+                            translation: '這座歷史建築儘管年代久遠且經受風化，但結構依然完好。'
+                        },
+                        {
+                            words: ['The', 'international', 'conference', 'was', 'remarkably', 'successful', 'in', 'achieving', 'its', 'goals'],
+                            correct: ['The', 'international', 'conference', 'was', 'remarkably', 'successful'],
+                            parts: ['Subject', 'Subject', 'Subject', 'Verb', 'Complement', 'Complement'],
+                            translation: '這次國際會議在實現其目標方面非常成功。'
+                        },
+                        {
+                            words: ['The', 'unexpected', 'results', 'appeared', 'quite', 'significant', 'to', 'the', 'research', 'team'],
+                            correct: ['The', 'unexpected', 'results', 'appeared', 'quite', 'significant'],
+                            parts: ['Subject', 'Subject', 'Subject', 'Verb', 'Complement', 'Complement'],
+                            translation: '這些意外的結果對研究團隊來說似乎相當重要。'
+                        },
+                        {
+                            words: ['The', 'newly', 'elected', 'president', 'became', 'increasingly', 'popular', 'among', 'young', 'voters'],
+                            correct: ['The', 'newly', 'elected', 'president', 'became', 'increasingly', 'popular'],
+                            parts: ['Subject', 'Subject', 'Subject', 'Subject', 'Verb', 'Complement', 'Complement'],
+                            translation: '這位新當選的總統在年輕選民中變得越來越受歡迎。'
+                        }
+                    ],
+                    displayColors: ['bg-blue-100 text-blue-800', 'bg-green-100 text-green-800', 'bg-pink-100 text-pink-800'],
+                    exampleList: [
+                        {
+                            en: "The abandoned house looks incredibly spooky at night.",
+                            zh: "這座廢棄的房子在夜晚看起來非常陰森。"
+                        },
+                        {
+                            en: "My neighbor's cat is surprisingly friendly to strangers.",
+                            zh: "我鄰居的貓對陌生人出奇地友善。"
+                        },
+                        {
+                            en: "The new restaurant became very popular among local residents.",
+                            zh: "這家新餐廳在當地居民中變得非常受歡迎。"
+                        },
+                        {
+                            en: "The weather forecast remains uncertain for the weekend.",
+                            zh: "週末的天氣預報仍然不確定。"
+                        },
+                        {
+                            en: "Her explanation sounds completely reasonable to me.",
+                            zh: "她的解釋對我來說聽起來完全合理。"
+                        }
+                    ]
+                }
+            };
+            
+            // Initialize drag and drop
+            function initDragAndDrop() {
+                document.addEventListener('dragstart', function(e) {
+                    if (e.target.classList.contains('draggable')) {
+                        draggedElement = e.target;
+                        e.dataTransfer.effectAllowed = 'move';
+                        e.dataTransfer.setData('text/plain', ''); // Required for Firefox
+                        e.target.classList.add('opacity-50');
+                    }
+                });
+                
+                document.addEventListener('dragend', function(e) {
+                    if (e.target.classList.contains('draggable')) {
+                        e.target.classList.remove('opacity-50');
+                    }
+                });
+                
+                sentenceBuilder.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    this.classList.add('highlight');
+                });
+                
+                sentenceBuilder.addEventListener('dragleave', function() {
+                    this.classList.remove('highlight');
+                });
+                
+                sentenceBuilder.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('highlight');
+                    
+                    if (draggedElement) {
+                        if (draggedElement.parentNode === wordBank) {
+                            // Clone the word from word bank to sentence builder
+                            const clone = draggedElement.cloneNode(true);
+                            clone.classList.add('draggable');
+                            clone.setAttribute('draggable', 'true');
+                            this.appendChild(clone);
+                            
+                            // Add click event to remove word
+                            clone.addEventListener('click', function() {
+                                this.remove();
+                            });
+                        } else if (draggedElement.parentNode === sentenceBuilder) {
+                            // Reorder within sentence builder
+                            const afterElement = getDragAfterElement(this, e.clientX);
+                            if (afterElement) {
+                                this.insertBefore(draggedElement, afterElement);
+                            } else {
+                                this.appendChild(draggedElement);
+                            }
+                        }
+                    }
+                });
+                
+                wordBank.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                });
+                
+                wordBank.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    
+                    if (draggedElement && draggedElement.parentNode === sentenceBuilder) {
+                        // Remove word from sentence builder when dropped back to word bank
+                        draggedElement.remove();
+                    }
+                });
+            }
+            
+            function getDragAfterElement(container, x) {
+                const draggableElements = [...container.querySelectorAll('.draggable:not(.opacity-50)')];
+                
+                return draggableElements.reduce((closest, child) => {
+                    const box = child.getBoundingClientRect();
+                    const offset = x - box.left - box.width / 2;
+                    
+                    if (offset < 0 && offset > closest.offset) {
+                        return { offset: offset, element: child };
+                    } else {
+                        return closest;
+                    }
+                }, { offset: Number.NEGATIVE_INFINITY }).element;
+            }
+            
+            // Set up pattern selection
+            sentencePatterns.forEach(pattern => {
+                pattern.addEventListener('click', function() {
+                    currentPattern = this.dataset.pattern;
+                    currentExampleIndex = 0;
+                    
+                    // Hide pattern selection, show practice area
+                    document.querySelectorAll('.sentence-pattern').forEach(p => {
+                        p.parentNode.classList.add('hidden');
+                    });
+                    practiceArea.classList.remove('hidden');
+                    explanationArea.classList.remove('hidden');
+                    
+                    // Update total sentences count
+                    totalSentences.textContent = patterns[currentPattern].examples.length;
+                    
+                    // Display pattern information
+                    displayPatternInfo();
+                    
+                    // Load first example
+                    loadExample();
+                });
+            });
+            
+            // Back button
+            backBtn.addEventListener('click', function() {
+                practiceArea.classList.add('hidden');
+                explanationArea.classList.add('hidden');
+                document.querySelectorAll('.sentence-pattern').forEach(p => {
+                    p.parentNode.classList.remove('hidden');
+                });
+                feedback.classList.add('hidden');
+                nextBtn.classList.add('hidden');
+            });
+            
+            // Next button
+            nextBtn.addEventListener('click', function() {
+                currentExampleIndex++;
+                if (currentExampleIndex >= patterns[currentPattern].examples.length) {
+                    currentExampleIndex = 0;
+                }
+                loadExample();
+                feedback.classList.add('hidden');
+                nextBtn.classList.add('hidden');
+                
+                // Update progress
+                updateProgress();
+            });
+            
+            // Check button
+            checkBtn.addEventListener('click', function() {
+                checkSentence();
+            });
+            
+            // Translation toggle
+            showTranslations.addEventListener('change', function() {
+                const translationElements = document.querySelectorAll('.example-translation');
+                translationElements.forEach(el => {
+                    if (this.checked) {
+                        el.classList.remove('hidden');
+                    } else {
+                        el.classList.add('hidden');
+                    }
+                });
+            });
+            
+            function updateProgress() {
+                // Update sentence number
+                currentSentenceNum.textContent = currentExampleIndex + 1;
+                
+                // Update progress bar
+                const progressPercentage = ((currentExampleIndex + 1) / patterns[currentPattern].examples.length) * 100;
+                progressBar.style.width = `${progressPercentage}%`;
+            }
+            
+            function displayPatternInfo() {
+                const pattern = patterns[currentPattern];
+                
+                // Display pattern components
+                patternDisplay.innerHTML = '';
+                const patternParts = currentPattern === 'svo' ? ['Subject', 'Verb', 'Object'] :
+                                    currentPattern === 'svdo' ? ['Subject', 'Verb', 'Indirect Object', 'Direct Object'] :
+                                    ['Subject', 'Verb', 'Complement'];
+                
+                const patternPartsZh = currentPattern === 'svo' ? ['主詞', '動詞', '受詞'] :
+                                      currentPattern === 'svdo' ? ['主詞', '動詞', '間接受詞', '直接受詞'] :
+                                      ['主詞', '連繫動詞', '補語'];
+                
+                patternParts.forEach((part, index) => {
+                    const span = document.createElement('span');
+                    span.className = `${pattern.displayColors[index]} px-3 py-1 rounded font-medium`;
+                    span.textContent = `${part} (${patternPartsZh[index]})`;
+                    patternDisplay.appendChild(span);
+                });
+                
+                // Display explanation
+                patternExplanation.textContent = pattern.explanation;
+                patternExplanationZh.textContent = pattern.explanationZh;
+                
+                // Display example sentences
+                exampleSentences.innerHTML = '';
+                pattern.exampleList.forEach(example => {
+                    const li = document.createElement('li');
+                    li.className = 'mb-2';
+                    li.innerHTML = `
+                        <div>${example.en}</div>
+                        <div class="example-translation chinese-translation text-sm mt-1 hidden">${example.zh}</div>
+                    `;
+                    exampleSentences.appendChild(li);
+                });
+            }
+            
+            function loadExample() {
+                const example = patterns[currentPattern].examples[currentExampleIndex];
+                
+                // Clear previous content
+                wordBank.innerHTML = '';
+                sentenceBuilder.innerHTML = '';
+                
+                // Display the translation hint
+                sentenceTranslationHint.textContent = example.translation;
+                
+                // Update progress
+                updateProgress();
+                
+                // Shuffle words
+                const shuffledWords = [...example.words].sort(() => Math.random() - 0.5);
+                
+                // Add words to word bank
+                shuffledWords.forEach(word => {
+                    const wordElement = document.createElement('div');
+                    wordElement.className = 'word-chip draggable bg-white border border-gray-300 px-3 py-1 rounded-full shadow-sm';
+                    wordElement.textContent = word;
+                    wordElement.setAttribute('draggable', 'true');
+                    wordBank.appendChild(wordElement);
+                });
+            }
+            
+            function checkSentence() {
+                const currentWords = Array.from(sentenceBuilder.children).map(el => el.textContent);
+                const correctWords = patterns[currentPattern].examples[currentExampleIndex].correct;
+                const correctParts = patterns[currentPattern].examples[currentExampleIndex].parts;
+                const translation = patterns[currentPattern].examples[currentExampleIndex].translation;
+                
+                // Check if the sentence is correct
+                let isCorrect = true;
+                if (currentWords.length !== correctWords.length) {
+                    isCorrect = false;
+                } else {
+                    for (let i = 0; i < currentWords.length; i++) {
+                        if (currentWords[i] !== correctWords[i]) {
+                            isCorrect = false;
+                            break;
+                        }
+                    }
+                }
+                
+                // Display feedback
+                feedback.classList.remove('hidden', 'bg-green-100', 'border-green-200', 'bg-red-100', 'border-red-200');
+                
+                if (isCorrect) {
+                    feedback.classList.add('bg-green-100', 'border', 'border-green-200', 'feedback-correct');
+                    
+                    // Create feedback content with part of speech labels
+                    let feedbackContent = '<p class="font-medium text-green-800 mb-2">Correct! Great job! 正確！做得好！</p>';
+                    
+                    // Add the complete sentence
+                    const completeSentence = correctWords.join(' ');
+                    feedbackContent += `<p class="mb-3">"${completeSentence}"</p>`;
+                    
+                    // Add Chinese translation
+                    feedbackContent += `<p class="chinese-translation mb-3">${translation}</p>`;
+                    
+                    // Add word analysis
+                    feedbackContent += '<div class="flex flex-wrap gap-2 mt-2">';
+                    
+                    for (let i = 0; i < correctWords.length; i++) {
+                        const partColor = correctParts[i] === 'Subject' ? 'bg-blue-100 text-blue-800' :
+                                        correctParts[i] === 'Verb' ? 'bg-green-100 text-green-800' :
+                                        correctParts[i] === 'Object' || correctParts[i] === 'Direct Object' ? 'bg-amber-100 text-amber-800' :
+                                        correctParts[i] === 'Indirect Object' ? 'bg-purple-100 text-purple-800' :
+                                        'bg-pink-100 text-pink-800';
+                        
+                        const partZh = correctParts[i] === 'Subject' ? '主詞' :
+                                     correctParts[i] === 'Verb' ? '動詞' :
+                                     correctParts[i] === 'Object' ? '受詞' :
+                                     correctParts[i] === 'Direct Object' ? '直接受詞' :
+                                     correctParts[i] === 'Indirect Object' ? '間接受詞' :
+                                     '補語';
+                        
+                        feedbackContent += `
+                            <div class="flex flex-col items-center">
+                                <span class="px-3 py-1 rounded border border-gray-200 bg-white">${correctWords[i]}</span>
+                                <span class="text-xs mt-1 ${partColor} px-2 py-0.5 rounded">${correctParts[i]}</span>
+                                <span class="text-xs mt-0.5 chinese-translation">${partZh}</span>
+                            </div>
+                        `;
+                    }
+                    
+                    feedbackContent += '</div>';
+                    feedback.innerHTML = feedbackContent;
+                    
+                    // Show next button
+                    nextBtn.classList.remove('hidden');
+                } else {
+                    feedback.classList.add('bg-red-100', 'border', 'border-red-200');
+                    feedback.innerHTML = '<p class="text-red-800">Not quite right. Try again! 不太對，再試一次！</p>';
+                }
+            }
+            
+            // Initialize drag and drop
+            initDragAndDrop();
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9594b3c7d7c98091',t:'MTc1MTUyODA4Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
